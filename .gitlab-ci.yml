@@ -1,0 +1,20 @@
+stages:
+  - build
+
+variables:
+  IMAGE_NAME: "10.1.20.108:8086/monitoring/omd-audit-to-es"
+  IMAGE_TAG: "1.4"
+
+build-job:
+  stage: build
+  script:
+    - |
+      if [[ "$(docker images -q $IMAGE_NAME:$IMAGE_TAG 2> /dev/null)" != "" ]]; then
+        echo "Removing image $IMAGE_NAME:$IMAGE_TAG"
+        docker rmi $IMAGE_NAME:$IMAGE_TAG
+      else
+        echo "Image $IMAGE_NAME:$IMAGE_TAG does not exist, skipping removal."
+      fi
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+    - docker rmi $IMAGE_NAME:$IMAGE_TAG
